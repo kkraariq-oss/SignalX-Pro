@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#1a1625">
+  <meta name="description" content="محلل تداول متقدم للعملات الرقمية والفوركس والأسهم مع إشارات حية وتحليل تقني شامل">
+  <meta name="keywords" content="تداول, فوركس, عملات رقمية, أسهم, تحليل تقني, RSI, MACD">
+  
+  <!-- Apple Meta Tags -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="محلل التداول">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  
+  <!-- Favicons -->
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#00d4aa">
+  
+  <title>محلل التداول المتقدم - PWA</title>
+  
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+        'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+        sans-serif, 'Tajawal', 'Cairo';
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      background: #0f0a19;
+      color: #e2e8f0;
+      overflow-x: hidden;
+    }
+    
+    #root {
+      width: 100%;
+      min-height: 100vh;
+    }
+    
+    /* Loading Screen */
+    .loading-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #0f0a19 0%, #1a1625 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      transition: opacity 0.3s ease;
+    }
+    
+    .loading-screen.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+    
+    .loading-logo {
+      font-size: 4rem;
+      margin-bottom: 2rem;
+      animation: pulse 2s ease-in-out infinite;
+    }
+    
+    .loading-text {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #00d4aa;
+      margin-bottom: 1rem;
+    }
+    
+    .loading-spinner {
+      width: 50px;
+      height: 50px;
+      border: 4px solid rgba(0, 212, 170, 0.1);
+      border-top: 4px solid #00d4aa;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.1); opacity: 0.8; }
+    }
+    
+    /* Install Prompt */
+    .install-prompt {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(135deg, #00d4aa 0%, #00a886 100%);
+      color: white;
+      padding: 12px 24px;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0, 212, 170, 0.3);
+      display: none;
+      align-items: center;
+      gap: 12px;
+      z-index: 1000;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+    
+    .install-prompt:hover {
+      transform: translateX(-50%) scale(1.05);
+    }
+    
+    .install-prompt.show {
+      display: flex;
+      animation: slideUp 0.3s ease;
+    }
+    
+    @keyframes slideUp {
+      from {
+        bottom: -100px;
+        opacity: 0;
+      }
+      to {
+        bottom: 20px;
+        opacity: 1;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  
+  <!-- Loading Screen -->
+  <div class="loading-screen" id="loadingScreen">
+    <div class="loading-logo">📈</div>
+    <div class="loading-text">محلل التداول المتقدم</div>
+    <div class="loading-spinner"></div>
+  </div>
+  
+  <!-- Install Prompt -->
+  <div class="install-prompt" id="installPrompt">
+    <span>📱</span>
+    <span>ثبّت التطبيق على جهازك</span>
+  </div>
+  
+  <script type="module" src="/src/main.jsx"></script>
+  
+  <script>
+    // Hide loading screen when app is ready
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        document.getElementById('loadingScreen').classList.add('hidden');
+      }, 1000);
+    });
+    
+    // PWA Install Prompt
+    let deferredPrompt;
+    const installPrompt = document.getElementById('installPrompt');
+    
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      installPrompt.classList.add('show');
+    });
+    
+    installPrompt.addEventListener('click', async () => {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        console.log(`User response to install prompt: ${outcome}`);
+        deferredPrompt = null;
+        installPrompt.classList.remove('show');
+      }
+    });
+    
+    window.addEventListener('appinstalled', () => {
+      console.log('PWA تم تثبيت التطبيق');
+      installPrompt.classList.remove('show');
+    });
+    
+    // Register Service Worker
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+          .then(registration => {
+            console.log('SW registered:', registration);
+          })
+          .catch(err => {
+            console.log('SW registration failed:', err);
+          });
+      });
+    }
+  </script>
+</body>
+</html>

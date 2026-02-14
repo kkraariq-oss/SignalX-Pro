@@ -1,0 +1,23 @@
+{
+  "name": "trading-analyzer-pwa",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "محلل تداول متقدم - تطبيق PWA",
+  "scripts": {
+    "dev": "vite --host 0.0.0.0 --port 5173",
+    "build": "vite build",
+    "preview": "vite preview",
+    "deploy": "npm run build && gh-pages -d dist"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "recharts": "^2.10.3"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.2.1",
+    "vite": "^5.0.8",
+    "vite-plugin-pwa": "^0.17.4",
+    "gh-pages": "^6.1.0"
+  }
+}
