@@ -1,205 +1,1409 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <meta name="theme-color" content="#1a1625">
-  <meta name="description" content="محلل تداول متقدم للعملات الرقمية والفوركس والأسهم مع إشارات حية وتحليل تقني شامل">
-  <meta name="keywords" content="تداول, فوركس, عملات رقمية, أسهم, تحليل تقني, RSI, MACD">
-  
-  <!-- Apple Meta Tags -->
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="محلل التداول">
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-  
-  <!-- Favicons -->
-  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-  <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#00d4aa">
-  
-  <title>محلل التداول المتقدم - PWA</title>
-  
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>محلل التداول المتقدم - Trading Analyzer</title>
     
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-        'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-        sans-serif, 'Tajawal', 'Cairo';
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-      background: #0f0a19;
-      color: #e2e8f0;
-      overflow-x: hidden;
-    }
+    <!-- Chart.js for charts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     
-    #root {
-      width: 100%;
-      min-height: 100vh;
-    }
-    
-    /* Loading Screen */
-    .loading-screen {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(135deg, #0f0a19 0%, #1a1625 100%);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      z-index: 9999;
-      transition: opacity 0.3s ease;
-    }
-    
-    .loading-screen.hidden {
-      opacity: 0;
-      pointer-events: none;
-    }
-    
-    .loading-logo {
-      font-size: 4rem;
-      margin-bottom: 2rem;
-      animation: pulse 2s ease-in-out infinite;
-    }
-    
-    .loading-text {
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: #00d4aa;
-      margin-bottom: 1rem;
-    }
-    
-    .loading-spinner {
-      width: 50px;
-      height: 50px;
-      border: 4px solid rgba(0, 212, 170, 0.1);
-      border-top: 4px solid #00d4aa;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-    }
-    
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-    
-    @keyframes pulse {
-      0%, 100% { transform: scale(1); opacity: 1; }
-      50% { transform: scale(1.1); opacity: 0.8; }
-    }
-    
-    /* Install Prompt */
-    .install-prompt {
-      position: fixed;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: linear-gradient(135deg, #00d4aa 0%, #00a886 100%);
-      color: white;
-      padding: 12px 24px;
-      border-radius: 12px;
-      box-shadow: 0 4px 20px rgba(0, 212, 170, 0.3);
-      display: none;
-      align-items: center;
-      gap: 12px;
-      z-index: 1000;
-      font-weight: 600;
-      cursor: pointer;
-      transition: transform 0.2s ease;
-    }
-    
-    .install-prompt:hover {
-      transform: translateX(-50%) scale(1.05);
-    }
-    
-    .install-prompt.show {
-      display: flex;
-      animation: slideUp 0.3s ease;
-    }
-    
-    @keyframes slideUp {
-      from {
-        bottom: -100px;
-        opacity: 0;
-      }
-      to {
-        bottom: 20px;
-        opacity: 1;
-      }
-    }
-  </style>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg: #060a10;
+            --card: #0d1420;
+            --card-alt: #111c2e;
+            --border: #1a2744;
+            --border-light: #243352;
+            --accent: #e8b230;
+            --accent-dim: #7a5a10;
+            --buy: #00d4a1;
+            --buy-dim: #003d30;
+            --sell: #ff4d6a;
+            --sell-dim: #3d0015;
+            --wait: #ffb020;
+            --wait-dim: #3d2800;
+            --text: #e8ecf4;
+            --dim: #8899b4;
+            --muted: #4a5e80;
+            --ema9: #22d3ee;
+            --ema21: #818cf8;
+            --ema50: #f472b6;
+            --rsi: #a78bfa;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--card), var(--card-alt));
+            border-bottom: 2px solid var(--accent);
+            padding: 16px 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .logo {
+            font-size: 22px;
+            font-weight: 900;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .header-controls {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        /* Navigation */
+        .nav-bar {
+            background: linear-gradient(90deg, rgba(13,20,32,0.5), rgba(6,10,16,0.5));
+            border-bottom: 1px solid rgba(26,39,68,0.3);
+            padding: 8px 20px;
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        /* Buttons */
+        .btn {
+            background: var(--card);
+            color: var(--text);
+            border: 1px solid var(--border);
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(232,178,48,0.2);
+            border-color: var(--accent);
+        }
+
+        .btn.active {
+            background: var(--accent-dim);
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .btn.buy {
+            background: var(--buy);
+            color: var(--bg);
+            border: none;
+        }
+
+        .btn.sell {
+            background: var(--sell);
+            color: var(--bg);
+            border: none;
+        }
+
+        /* Card */
+        .crd {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+        }
+
+        /* Grid layouts */
+        .grid {
+            display: grid;
+            gap: 12px;
+        }
+
+        .grid-2 { grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); }
+        .grid-3 { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+        .grid-4 { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+
+        /* Signal Badge */
+        .signal-badge {
+            background: linear-gradient(145deg, var(--buy-dim), var(--card));
+            border: 2px solid rgba(0,212,161,0.3);
+            border-radius: 16px;
+            padding: 16px;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .signal-badge:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 40px rgba(0,212,161,0.2);
+        }
+
+        .signal-badge.sell {
+            background: linear-gradient(145deg, var(--sell-dim), var(--card));
+            border-color: rgba(255,77,106,0.3);
+        }
+
+        .signal-badge.wait {
+            background: linear-gradient(145deg, var(--wait-dim), var(--card));
+            border-color: rgba(255,176,32,0.3);
+        }
+
+        .signal-icon {
+            font-size: 32px;
+            font-weight: 900;
+            line-height: 1;
+        }
+
+        .signal-confidence {
+            font-size: 18px;
+            font-weight: 900;
+            font-family: monospace;
+        }
+
+        /* Input fields */
+        input, select {
+            background: var(--card-alt);
+            color: var(--text);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 8px 12px;
+            font-size: 13px;
+            width: 100%;
+            font-family: inherit;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 500px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        /* Account Info */
+        .account-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 10px;
+        }
+
+        .account-item {
+            padding: 12px;
+            border-radius: 8px;
+            border-right: 3px solid;
+        }
+
+        .account-item.balance {
+            background: rgba(0,212,161,0.1);
+            border-color: var(--buy);
+        }
+
+        .account-item.equity {
+            background: rgba(232,178,48,0.1);
+            border-color: var(--accent);
+        }
+
+        .account-item.profit {
+            background: rgba(0,212,161,0.1);
+            border-color: var(--buy);
+        }
+
+        .account-item.profit.negative {
+            background: rgba(255,77,106,0.1);
+            border-color: var(--sell);
+        }
+
+        /* Position card */
+        .position-card {
+            background: rgba(0,212,161,0.05);
+            border: 1px solid rgba(0,212,161,0.15);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 8px;
+        }
+
+        .position-card.sell {
+            background: rgba(255,77,106,0.05);
+            border-color: rgba(255,77,106,0.15);
+        }
+
+        .position-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .position-badge {
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 4px;
+            background: rgba(0,212,161,0.2);
+            color: var(--buy);
+        }
+
+        .position-badge.sell {
+            background: rgba(255,77,106,0.2);
+            color: var(--sell);
+        }
+
+        /* Charts */
+        .chart-container {
+            position: relative;
+            height: 280px;
+            margin: 12px 0;
+        }
+
+        .chart-small {
+            height: 120px;
+        }
+
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--muted);
+        }
+
+        .spinner {
+            border: 3px solid var(--border);
+            border-top: 3px solid var(--accent);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 16px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Status banner */
+        .status-banner {
+            padding: 12px 20px;
+            margin: 0 20px 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-banner.info {
+            background: rgba(0,212,161,0.1);
+            border: 1px solid rgba(0,212,161,0.3);
+            color: var(--buy);
+        }
+
+        .status-banner.error {
+            background: rgba(255,77,106,0.1);
+            border: 1px solid rgba(255,77,106,0.3);
+            color: var(--sell);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+            }
+            
+            .nav-bar {
+                justify-content: center;
+            }
+            
+            .account-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Utilities */
+        .hidden { display: none !important; }
+        .text-center { text-align: center; }
+        .text-buy { color: var(--buy); }
+        .text-sell { color: var(--sell); }
+        .text-accent { color: var(--accent); }
+        .text-muted { color: var(--muted); }
+        .font-mono { font-family: monospace; }
+        .font-bold { font-weight: 700; }
+        .mt-1 { margin-top: 8px; }
+        .mb-1 { margin-bottom: 8px; }
+        .p-2 { padding: 16px; }
+        
+        /* Animations */
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+    </style>
 </head>
 <body>
-  <div id="root"></div>
-  
-  <!-- Loading Screen -->
-  <div class="loading-screen" id="loadingScreen">
-    <div class="loading-logo">📈</div>
-    <div class="loading-text">محلل التداول المتقدم</div>
-    <div class="loading-spinner"></div>
-  </div>
-  
-  <!-- Install Prompt -->
-  <div class="install-prompt" id="installPrompt">
-    <span>📱</span>
-    <span>ثبّت التطبيق على جهازك</span>
-  </div>
-  
-  <script type="module" src="/src/main.jsx"></script>
-  
-  <script>
-    // Hide loading screen when app is ready
-    window.addEventListener('load', () => {
-      setTimeout(() => {
-        document.getElementById('loadingScreen').classList.add('hidden');
-      }, 1000);
-    });
-    
-    // PWA Install Prompt
-    let deferredPrompt;
-    const installPrompt = document.getElementById('installPrompt');
-    
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      deferredPrompt = e;
-      installPrompt.classList.add('show');
-    });
-    
-    installPrompt.addEventListener('click', async () => {
-      if (deferredPrompt) {
-        deferredPrompt.prompt();
-        const { outcome } = await deferredPrompt.userChoice;
-        console.log(`User response to install prompt: ${outcome}`);
-        deferredPrompt = null;
-        installPrompt.classList.remove('show');
-      }
-    });
-    
-    window.addEventListener('appinstalled', () => {
-      console.log('PWA تم تثبيت التطبيق');
-      installPrompt.classList.remove('show');
-    });
-    
-    // Register Service Worker
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('/sw.js')
-          .then(registration => {
-            console.log('SW registered:', registration);
-          })
-          .catch(err => {
-            console.log('SW registration failed:', err);
-          });
-      });
-    }
-  </script>
+    <!-- Header -->
+    <div class="header">
+        <div class="header-content">
+            <div class="logo">
+                <span>📊</span>
+                <span>محلل التداول المتقدم</span>
+            </div>
+            <div class="header-controls">
+                <button class="btn" onclick="toggleLive()">
+                    <span id="liveBtn">▶ مباشر</span>
+                </button>
+                <button class="btn" onclick="refreshData()">🔄 تحديث</button>
+                <button class="btn" onclick="toggleSettings()">⚙️ إعدادات</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="nav-bar">
+        <button class="btn active" onclick="switchView('dashboard')" data-view="dashboard">📊 لوحة</button>
+        <button class="btn" onclick="switchView('single')" data-view="single">📈 تحليل</button>
+        <button class="btn" onclick="switchView('trading')" data-view="trading">💼 التداول</button>
+        <button class="btn" onclick="switchView('history')" data-view="history">📚 السجل</button>
+        <button class="btn" onclick="switchView('analytics')" data-view="analytics">📉 إحصائيات</button>
+    </div>
+
+    <!-- Status Banner -->
+    <div id="statusBanner" class="status-banner hidden"></div>
+
+    <!-- Main Container -->
+    <div class="container" style="padding: 20px;">
+        
+        <!-- Dashboard View -->
+        <div id="dashboardView" class="view-container">
+            <div class="crd mb-1">
+                <h2 style="font-size: 18px; font-weight: 800; color: var(--accent); margin-bottom: 16px;">
+                    🎯 نظرة عامة - العملات الرقمية
+                </h2>
+                <div id="dashboardGrid" class="grid grid-3">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <p>جاري تحميل البيانات...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Single View -->
+        <div id="singleView" class="view-container hidden">
+            <div class="crd">
+                <h2 style="font-size: 18px; font-weight: 800; color: var(--accent); margin-bottom: 16px;">
+                    📈 التحليل التفصيلي - <span id="currentSymbol">BTC/USD</span>
+                </h2>
+                
+                <div style="display: grid; grid-template-columns: 1fr 280px; gap: 16px;">
+                    <!-- Chart Area -->
+                    <div>
+                        <div class="crd">
+                            <div class="chart-container">
+                                <canvas id="priceChart"></canvas>
+                            </div>
+                        </div>
+                        
+                        <div class="crd">
+                            <h3 style="font-size: 14px; color: var(--rsi); margin-bottom: 8px;">RSI (14)</h3>
+                            <div class="chart-container chart-small">
+                                <canvas id="rsiChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Sidebar -->
+                    <div>
+                        <div id="signalBadge" class="crd">
+                            <div class="loading text-center">
+                                <div class="spinner"></div>
+                                <p style="font-size: 12px;">جاري التحليل...</p>
+                            </div>
+                        </div>
+                        
+                        <div class="crd">
+                            <h3 style="font-size: 14px; font-weight: 700; color: var(--accent); margin-bottom: 12px;">
+                                💰 إدارة المخاطر
+                            </h3>
+                            <div style="margin-bottom: 12px;">
+                                <label style="font-size: 11px; color: var(--dim); display: block; margin-bottom: 4px;">رصيد الحساب ($)</label>
+                                <input type="number" id="accountBalanceInput" value="10000" min="100" step="100">
+                            </div>
+                            <div style="margin-bottom: 12px;">
+                                <label style="font-size: 11px; color: var(--dim); display: block; margin-bottom: 4px;">نسبة المخاطرة (%)</label>
+                                <input type="number" id="riskPercentageInput" value="1" min="0.1" max="10" step="0.1">
+                            </div>
+                            <div id="riskCalculations" class="mt-1"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Trading View -->
+        <div id="tradingView" class="view-container hidden">
+            <div class="crd">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                    <h2 style="font-size: 18px; font-weight: 800; color: var(--accent);">💼 حساب التداول</h2>
+                    <button class="btn buy" onclick="openTradeModal()">+ صفقة جديدة</button>
+                </div>
+                
+                <!-- Account Info -->
+                <div class="crd" style="background: linear-gradient(145deg, var(--card), var(--card-alt)); margin-bottom: 16px;">
+                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+                        <div style="width: 60px; height: 60px; background: rgba(232,178,48,0.15); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px;">
+                            🏦
+                        </div>
+                        <div>
+                            <div style="font-size: 14px; font-weight: 700;">GTC Global SA (Pty) Ltd</div>
+                            <div style="font-size: 11px; color: var(--dim); margin-top: 2px;">حساب #6265717</div>
+                        </div>
+                    </div>
+                    
+                    <div class="account-grid" id="accountInfo">
+                        <div class="account-item balance">
+                            <div style="font-size: 9px; color: var(--muted); margin-bottom: 4px;">الرصيد</div>
+                            <div class="font-mono font-bold" style="font-size: 18px; color: var(--buy);" id="accountBalance">$112.95</div>
+                        </div>
+                        <div class="account-item equity">
+                            <div style="font-size: 9px; color: var(--muted); margin-bottom: 4px;">الحقوق</div>
+                            <div class="font-mono font-bold" style="font-size: 18px; color: var(--accent);" id="accountEquity">$112.95</div>
+                        </div>
+                        <div class="account-item profit" id="profitItem">
+                            <div style="font-size: 9px; color: var(--muted); margin-bottom: 4px;">الربح/الخسارة</div>
+                            <div class="font-mono font-bold" style="font-size: 18px; color: var(--buy);" id="accountProfit">$0.00</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Open Positions -->
+                <div class="crd">
+                    <h3 style="font-size: 14px; font-weight: 700; color: var(--accent); margin-bottom: 12px;">
+                        📊 المراكز المفتوحة (<span id="positionsCount">0</span>)
+                    </h3>
+                    <div id="openPositions">
+                        <div class="text-center" style="padding: 20px; color: var(--muted);">
+                            لا توجد مراكز مفتوحة
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- History View -->
+        <div id="historyView" class="view-container hidden">
+            <div class="crd">
+                <h2 style="font-size: 18px; font-weight: 800; color: var(--accent); margin-bottom: 16px;">
+                    📚 سجل الإشارات
+                </h2>
+                <div id="historyList">
+                    <div class="text-center" style="padding: 20px; color: var(--muted);">
+                        لا توجد إشارات محفوظة
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Analytics View -->
+        <div id="analyticsView" class="view-container hidden">
+            <div class="crd">
+                <h2 style="font-size: 18px; font-weight: 800; color: var(--accent); margin-bottom: 16px;">
+                    📉 تحليل الإشارات
+                </h2>
+                <div id="analyticsSummary" class="grid grid-3 mb-1"></div>
+                <div id="analyticsDetails"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Trade Modal -->
+    <div id="tradeModal" class="modal">
+        <div class="modal-content">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                <h3 style="font-size: 16px; font-weight: 700; color: var(--accent);">📝 صفقة جديدة</h3>
+                <button class="btn" onclick="closeTradeModal()" style="background: transparent; border: none; font-size: 24px; color: var(--muted); padding: 0; width: 32px; height: 32px;">×</button>
+            </div>
+            
+            <div style="margin-bottom: 12px;">
+                <label style="font-size: 11px; color: var(--dim); display: block; margin-bottom: 4px;">الزوج</label>
+                <select id="tradeSymbol">
+                    <option value="EUR/USD">EUR/USD</option>
+                    <option value="GBP/USD">GBP/USD</option>
+                    <option value="USD/JPY">USD/JPY</option>
+                    <option value="AUD/USD">AUD/USD</option>
+                    <option value="USD/CAD">USD/CAD</option>
+                </select>
+            </div>
+            
+            <div style="margin-bottom: 12px;">
+                <label style="font-size: 11px; color: var(--dim); display: block; margin-bottom: 4px;">نوع الأمر</label>
+                <div style="display: flex; gap: 8px;">
+                    <button class="btn buy" onclick="selectTradeType('BUY')" id="buyBtn" style="flex: 1;">شراء BUY</button>
+                    <button class="btn" onclick="selectTradeType('SELL')" id="sellBtn" style="flex: 1;">بيع SELL</button>
+                </div>
+            </div>
+            
+            <div style="margin-bottom: 12px;">
+                <label style="font-size: 11px; color: var(--dim); display: block; margin-bottom: 4px;">الحجم (Lot)</label>
+                <input type="number" id="tradeVolume" value="0.01" step="0.01" min="0.01">
+            </div>
+            
+            <div style="margin-bottom: 12px; padding: 12px; background: rgba(232,178,48,0.1); border-radius: 6px;">
+                <div style="font-size: 10px; color: var(--muted); margin-bottom: 4px;">السعر الحالي</div>
+                <div class="font-mono font-bold" style="font-size: 20px; color: var(--accent);" id="tradeCurrentPrice">1.08500</div>
+            </div>
+            
+            <div style="margin-bottom: 12px;">
+                <label style="font-size: 11px; color: var(--dim); display: block; margin-bottom: 4px;">وقف الخسارة (اختياري)</label>
+                <input type="number" id="tradeStopLoss" step="0.00001" placeholder="1.08000">
+            </div>
+            
+            <div style="margin-bottom: 16px;">
+                <label style="font-size: 11px; color: var(--dim); display: block; margin-bottom: 4px;">جني الأرباح (اختياري)</label>
+                <input type="number" id="tradeTakeProfit" step="0.00001" placeholder="1.09000">
+            </div>
+            
+            <div style="padding: 12px; background: rgba(0,212,161,0.1); border-radius: 6px; margin-bottom: 16px;">
+                <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 4px;">
+                    <span style="color: var(--muted);">الهامش المطلوب:</span>
+                    <span class="font-mono font-bold" id="requiredMargin">$10.85</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 11px;">
+                    <span style="color: var(--muted);">الرصيد المتاح:</span>
+                    <span class="font-mono font-bold text-buy" id="availableBalance">$112.95</span>
+                </div>
+            </div>
+            
+            <div id="tradeWarning" class="hidden" style="padding: 10px; background: rgba(255,77,106,0.1); border: 1px solid rgba(255,77,106,0.3); border-radius: 6px; font-size: 11px; color: var(--sell); margin-bottom: 16px;">
+                ⚠️ رصيد غير كافٍ لفتح هذه الصفقة
+            </div>
+            
+            <div style="display: flex; gap: 8px;">
+                <button class="btn" onclick="closeTradeModal()" style="flex: 1;">إلغاء</button>
+                <button class="btn buy" onclick="executeTrade()" id="executeBtn" style="flex: 1;">تنفيذ الصفقة</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ========== GLOBAL STATE ==========
+        let currentView = 'dashboard';
+        let isLive = false;
+        let tradeType = 'BUY';
+        let charts = {};
+        
+        // Data
+        let tradingAccount = JSON.parse(localStorage.getItem('ta3_trading_account') || JSON.stringify({
+            broker: 'GTC Global SA (Pty) Ltd',
+            accountNumber: '6265717',
+            balance: 112.95,
+            equity: 112.95,
+            margin: 0,
+            freeMargin: 112.95,
+            currency: 'USD'
+        }));
+        
+        let openPositions = JSON.parse(localStorage.getItem('ta3_open_positions') || '[]');
+        let tradeHistory = JSON.parse(localStorage.getItem('ta3_trade_history') || '[]');
+        let signalHistory = JSON.parse(localStorage.getItem('ta3_signal_history') || '[]');
+        
+        // ========== INITIALIZATION ==========
+        document.addEventListener('DOMContentLoaded', function() {
+            loadDashboard();
+            updateAccountDisplay();
+            updatePositionsDisplay();
+        });
+        
+        // ========== VIEW SWITCHING ==========
+        function switchView(view) {
+            currentView = view;
+            
+            // Hide all views
+            document.querySelectorAll('.view-container').forEach(v => v.classList.add('hidden'));
+            
+            // Show selected view
+            document.getElementById(view + 'View').classList.remove('hidden');
+            
+            // Update nav buttons
+            document.querySelectorAll('.nav-bar .btn').forEach(btn => {
+                if (btn.dataset.view === view) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+            
+            // Load view content
+            switch(view) {
+                case 'dashboard':
+                    loadDashboard();
+                    break;
+                case 'single':
+                    loadSingleAnalysis();
+                    break;
+                case 'trading':
+                    updateAccountDisplay();
+                    updatePositionsDisplay();
+                    break;
+                case 'history':
+                    loadHistory();
+                    break;
+                case 'analytics':
+                    loadAnalytics();
+                    break;
+            }
+        }
+        
+        // ========== DASHBOARD ==========
+        function loadDashboard() {
+            const grid = document.getElementById('dashboardGrid');
+            grid.innerHTML = '';
+            
+            const cryptoPairs = ['BTC/USD', 'ETH/USD', 'SOL/USD', 'BNB/USD', 'XRP/USD', 'ADA/USD'];
+            
+            cryptoPairs.forEach(pair => {
+                const signal = generateMockSignal(pair);
+                const card = createSignalCard(signal, pair);
+                grid.appendChild(card);
+            });
+        }
+        
+        function createSignalCard(signal, symbol) {
+            const div = document.createElement('div');
+            div.className = `signal-badge ${signal.action.toLowerCase()}`;
+            div.onclick = () => {
+                document.getElementById('currentSymbol').textContent = symbol;
+                switchView('single');
+                loadSingleAnalysis(symbol);
+            };
+            
+            const actionColors = {
+                'BUY': 'var(--buy)',
+                'SELL': 'var(--sell)',
+                'WAIT': 'var(--wait)'
+            };
+            
+            const actionIcons = {
+                'BUY': '▲',
+                'SELL': '▼',
+                'WAIT': '◆'
+            };
+            
+            div.innerHTML = `
+                <div style="position: absolute; top: 8px; right: 8px; font-size: 9px; font-weight: 700; color: var(--accent); background: rgba(13,20,32,0.7); padding: 2px 6px; border-radius: 4px;">
+                    ${symbol}
+                </div>
+                <div style="display: flex; align-items: center; gap: 12px; margin-top: 24px;">
+                    <div class="signal-icon" style="color: ${actionColors[signal.action]};">
+                        ${actionIcons[signal.action]}
+                    </div>
+                    <div style="flex: 1;">
+                        <div style="font-size: 16px; font-weight: 900; color: ${actionColors[signal.action]}; letter-spacing: 1px;">
+                            ${signal.action === 'BUY' ? 'شراء' : signal.action === 'SELL' ? 'بيع' : 'انتظار'}
+                        </div>
+                        <div style="font-size: 8px; color: var(--dim); margin-top: 2px;">
+                            ${signal.action} — ${signal.confidence}%
+                        </div>
+                    </div>
+                    <div class="signal-confidence" style="color: ${actionColors[signal.action]};">
+                        ${signal.confidence}%
+                    </div>
+                </div>
+                <div style="margin-top: 8px; display: flex; justify-content: space-between; font-size: 9px; color: var(--dim);">
+                    <span>تأكيدات: ${signal.confirmations}/10</span>
+                    <span>RSI: ${signal.rsi.toFixed(1)}</span>
+                </div>
+            `;
+            
+            return div;
+        }
+        
+        // ========== SINGLE ANALYSIS ==========
+        function loadSingleAnalysis(symbol = 'BTC/USD') {
+            const signal = generateMockSignal(symbol);
+            updateSignalBadge(signal);
+            updateRiskCalculations(signal);
+            createPriceChart(signal);
+            createRSIChart(signal);
+        }
+        
+        function updateSignalBadge(signal) {
+            const badge = document.getElementById('signalBadge');
+            const actionColors = {
+                'BUY': 'var(--buy)',
+                'SELL': 'var(--sell)',
+                'WAIT': 'var(--wait)'
+            };
+            
+            const actionIcons = {
+                'BUY': '▲',
+                'SELL': '▼',
+                'WAIT': '◆'
+            };
+            
+            const actionText = {
+                'BUY': 'شراء',
+                'SELL': 'بيع',
+                'WAIT': 'انتظار'
+            };
+            
+            badge.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <div style="font-size: 38px; font-weight: 900; color: ${actionColors[signal.action]}; line-height: 1;">
+                        ${actionIcons[signal.action]}
+                    </div>
+                    <div style="flex: 1;">
+                        <div style="font-size: 22px; font-weight: 900; color: ${actionColors[signal.action]}; letter-spacing: 2px;">
+                            ${actionText[signal.action]}
+                        </div>
+                        <div style="font-size: 10px; color: var(--dim); margin-top: 2px;">
+                            ${signal.action} — اتجاهي قوي
+                        </div>
+                    </div>
+                    <div style="position: relative; width: 60px; height: 60px;">
+                        <svg width="60" height="60" viewBox="0 0 60 60" style="transform: rotate(-90deg);">
+                            <circle cx="30" cy="30" r="24" fill="none" stroke="rgba(74,94,128,0.2)" stroke-width="5"></circle>
+                            <circle cx="30" cy="30" r="24" fill="none" stroke="${actionColors[signal.action]}" stroke-width="5"
+                                stroke-dasharray="${signal.confidence * 1.508} ${150.8 - signal.confidence * 1.508}" stroke-linecap="round"></circle>
+                        </svg>
+                        <div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 14px; color: ${actionColors[signal.action]};">
+                            ${signal.confidence}%
+                        </div>
+                    </div>
+                </div>
+                <div style="margin-top: 16px;">
+                    <div style="display: flex; justify-content: space-between; font-size: 11px; color: var(--dim); margin-bottom: 6px;">
+                        <span>مقياس التأكيدات</span>
+                        <span style="color: ${actionColors[signal.action]}; font-weight: 700;">${signal.confirmations}/10</span>
+                    </div>
+                    <div style="display: flex; gap: 3px;">
+                        ${Array.from({length: 10}).map((_, i) => `
+                            <div style="flex: 1; height: 8px; border-radius: 4px; background: ${i < signal.confirmations ? actionColors[signal.action] : 'rgba(74,94,128,0.3)'}; transition: all 0.4s;"></div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+        
+        function updateRiskCalculations(signal) {
+            const balance = parseFloat(document.getElementById('accountBalanceInput').value);
+            const riskPct = parseFloat(document.getElementById('riskPercentageInput').value);
+            
+            const riskAmount = (balance * riskPct) / 100;
+            const riskDistance = Math.abs(signal.entry - signal.stopLoss);
+            const positionSize = riskDistance > 0 ? riskAmount / riskDistance : 0;
+            const maxTrades = riskPct > 0 ? Math.floor(100 / riskPct) : 0;
+            
+            const tp1Distance = Math.abs(signal.tp1 - signal.entry);
+            const profit1 = positionSize * tp1Distance;
+            
+            const tp2Distance = Math.abs(signal.tp2 - signal.entry);
+            const profit2 = positionSize * tp2Distance;
+            
+            document.getElementById('riskCalculations').innerHTML = `
+                <div style="display: flex; flex-direction: column; gap: 4px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; border-radius: 6px; background: rgba(0,212,161,0.1); border-right: 3px solid var(--buy);">
+                        <span style="color: var(--dim); font-size: 11px;">المبلغ المخاطر به</span>
+                        <span class="font-mono font-bold" style="color: var(--buy); font-size: 12px;">$${riskAmount.toFixed(2)}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; border-radius: 6px; background: rgba(232,178,48,0.1); border-right: 3px solid var(--accent);">
+                        <span style="color: var(--dim); font-size: 11px;">حجم المركز المقترح</span>
+                        <span class="font-mono font-bold" style="color: var(--accent); font-size: 12px;">$${positionSize.toFixed(2)}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; border-radius: 6px; background: rgba(34,211,238,0.1); border-right: 3px solid var(--ema9);">
+                        <span style="color: var(--dim); font-size: 11px;">عدد الصفقات الممكنة</span>
+                        <span class="font-mono font-bold" style="color: var(--ema9); font-size: 12px;">${maxTrades}</span>
+                    </div>
+                    <div style="margin-top: 6px; padding: 8px 10px; border-radius: 6px; background: rgba(0,212,161,0.05); border: 1px solid rgba(0,212,161,0.15);">
+                        <div style="font-size: 10px; color: var(--dim); margin-bottom: 4px;">الأرباح المحتملة:</div>
+                        <div style="display: flex; justify-content: space-between; font-size: 11px; margin-bottom: 2px;">
+                            <span style="color: var(--muted);">هدف 1 (1.5R):</span>
+                            <span class="font-mono font-bold text-buy">+$${profit1.toFixed(2)}</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; font-size: 11px;">
+                            <span style="color: var(--muted);">هدف 2 (2.5R):</span>
+                            <span class="font-mono font-bold text-buy">+$${profit2.toFixed(2)}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // ========== CHARTS ==========
+        function createPriceChart(signal) {
+            const ctx = document.getElementById('priceChart');
+            if (!ctx) return;
+            
+            if (charts.price) {
+                charts.price.destroy();
+            }
+            
+            const chartData = generateMockChartData();
+            
+            charts.price = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: chartData.map(d => d.time),
+                    datasets: [{
+                        label: 'السعر',
+                        data: chartData.map(d => d.close),
+                        borderColor: 'rgb(232, 178, 48)',
+                        backgroundColor: 'rgba(232, 178, 48, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.1
+                    }, {
+                        label: 'EMA 9',
+                        data: chartData.map(d => d.ema9),
+                        borderColor: 'rgb(34, 211, 238)',
+                        borderWidth: 1,
+                        fill: false,
+                        pointRadius: 0
+                    }, {
+                        label: 'EMA 21',
+                        data: chartData.map(d => d.ema21),
+                        borderColor: 'rgb(129, 140, 248)',
+                        borderWidth: 1,
+                        fill: false,
+                        pointRadius: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            labels: { color: 'rgb(136, 153, 180)', font: { size: 10 } }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: { color: 'rgb(74, 94, 128)', font: { size: 9 } },
+                            grid: { color: 'rgba(21, 32, 53, 0.5)' }
+                        },
+                        y: {
+                            ticks: { color: 'rgb(74, 94, 128)', font: { size: 9 } },
+                            grid: { color: 'rgba(21, 32, 53, 0.5)' }
+                        }
+                    }
+                }
+            });
+        }
+        
+        function createRSIChart(signal) {
+            const ctx = document.getElementById('rsiChart');
+            if (!ctx) return;
+            
+            if (charts.rsi) {
+                charts.rsi.destroy();
+            }
+            
+            const chartData = generateMockChartData();
+            
+            charts.rsi = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: chartData.map(d => d.time),
+                    datasets: [{
+                        label: 'RSI',
+                        data: chartData.map(d => d.rsi),
+                        borderColor: 'rgb(167, 139, 250)',
+                        backgroundColor: 'rgba(167, 139, 250, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        x: {
+                            ticks: { color: 'rgb(74, 94, 128)', font: { size: 8 } },
+                            grid: { color: 'rgba(21, 32, 53, 0.5)' }
+                        },
+                        y: {
+                            min: 0,
+                            max: 100,
+                            ticks: { color: 'rgb(74, 94, 128)', font: { size: 8 } },
+                            grid: { color: 'rgba(21, 32, 53, 0.5)' }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // ========== TRADING ==========
+        function openTradeModal() {
+            document.getElementById('tradeModal').classList.add('active');
+            updateTradeModalCalculations();
+        }
+        
+        function closeTradeModal() {
+            document.getElementById('tradeModal').classList.remove('active');
+        }
+        
+        function selectTradeType(type) {
+            tradeType = type;
+            const buyBtn = document.getElementById('buyBtn');
+            const sellBtn = document.getElementById('sellBtn');
+            
+            if (type === 'BUY') {
+                buyBtn.className = 'btn buy';
+                sellBtn.className = 'btn';
+            } else {
+                buyBtn.className = 'btn';
+                sellBtn.className = 'btn sell';
+            }
+        }
+        
+        function updateTradeModalCalculations() {
+            const volume = parseFloat(document.getElementById('tradeVolume').value);
+            const price = parseFloat(document.getElementById('tradeCurrentPrice').textContent.replace('$', ''));
+            
+            const margin = (volume * price * 100000) / 100; // 1:100 leverage
+            document.getElementById('requiredMargin').textContent = `$${margin.toFixed(2)}`;
+            document.getElementById('availableBalance').textContent = `$${tradingAccount.balance.toFixed(2)}`;
+            
+            const warning = document.getElementById('tradeWarning');
+            const executeBtn = document.getElementById('executeBtn');
+            
+            if (margin > tradingAccount.balance) {
+                warning.classList.remove('hidden');
+                executeBtn.disabled = true;
+                executeBtn.style.opacity = '0.5';
+            } else {
+                warning.classList.add('hidden');
+                executeBtn.disabled = false;
+                executeBtn.style.opacity = '1';
+            }
+        }
+        
+        document.getElementById('tradeVolume')?.addEventListener('input', updateTradeModalCalculations);
+        
+        function executeTrade() {
+            const symbol = document.getElementById('tradeSymbol').value;
+            const volume = parseFloat(document.getElementById('tradeVolume').value);
+            const price = parseFloat(document.getElementById('tradeCurrentPrice').textContent);
+            const stopLoss = document.getElementById('tradeStopLoss').value;
+            const takeProfit = document.getElementById('tradeTakeProfit').value;
+            
+            const margin = (volume * price * 100000) / 100;
+            
+            if (margin > tradingAccount.balance) {
+                showStatus('error', 'رصيد غير كافٍ');
+                return;
+            }
+            
+            const trade = {
+                id: Date.now(),
+                ticket: Math.floor(100000 + Math.random() * 900000),
+                symbol: symbol,
+                action: tradeType,
+                volume: volume,
+                openPrice: price,
+                stopLoss: stopLoss ? parseFloat(stopLoss) : null,
+                takeProfit: takeProfit ? parseFloat(takeProfit) : null,
+                openTime: Date.now(),
+                profit: 0,
+                margin: margin,
+                commission: -0.50
+            };
+            
+            openPositions.push(trade);
+            tradingAccount.balance += trade.commission;
+            
+            saveData();
+            updateAccountDisplay();
+            updatePositionsDisplay();
+            closeTradeModal();
+            showStatus('info', `تم فتح صفقة ${tradeType} ${symbol}`);
+        }
+        
+        function closePosition(positionId) {
+            const position = openPositions.find(p => p.id === positionId);
+            if (!position) return;
+            
+            const currentPrice = parseFloat(document.getElementById('tradeCurrentPrice').textContent);
+            const pips = position.action === 'BUY' 
+                ? (currentPrice - position.openPrice) 
+                : (position.openPrice - currentPrice);
+            
+            const profit = pips * position.volume * 10000;
+            
+            tradingAccount.balance += profit;
+            
+            const closedTrade = {
+                ...position,
+                closePrice: currentPrice,
+                closeTime: Date.now(),
+                profit: profit,
+                status: 'closed'
+            };
+            
+            tradeHistory.unshift(closedTrade);
+            if (tradeHistory.length > 100) tradeHistory = tradeHistory.slice(0, 100);
+            
+            openPositions = openPositions.filter(p => p.id !== positionId);
+            
+            saveData();
+            updateAccountDisplay();
+            updatePositionsDisplay();
+            showStatus('info', `تم إغلاق الصفقة. ${profit >= 0 ? 'ربح' : 'خسارة'}: $${profit.toFixed(2)}`);
+        }
+        
+        function updateAccountDisplay() {
+            const floatingPL = openPositions.reduce((sum, pos) => {
+                const currentPrice = 1.085; // Mock price
+                const pips = pos.action === 'BUY' 
+                    ? (currentPrice - pos.openPrice) 
+                    : (pos.openPrice - currentPrice);
+                return sum + (pips * pos.volume * 10000);
+            }, 0);
+            
+            const equity = tradingAccount.balance + floatingPL;
+            
+            document.getElementById('accountBalance').textContent = `$${tradingAccount.balance.toFixed(2)}`;
+            document.getElementById('accountEquity').textContent = `$${equity.toFixed(2)}`;
+            document.getElementById('accountProfit').textContent = `${floatingPL >= 0 ? '+' : ''}$${floatingPL.toFixed(2)}`;
+            
+            const profitItem = document.getElementById('profitItem');
+            if (floatingPL >= 0) {
+                profitItem.className = 'account-item profit';
+                document.getElementById('accountProfit').style.color = 'var(--buy)';
+            } else {
+                profitItem.className = 'account-item profit negative';
+                document.getElementById('accountProfit').style.color = 'var(--sell)';
+            }
+        }
+        
+        function updatePositionsDisplay() {
+            const container = document.getElementById('openPositions');
+            document.getElementById('positionsCount').textContent = openPositions.length;
+            
+            if (openPositions.length === 0) {
+                container.innerHTML = '<div class="text-center" style="padding: 20px; color: var(--muted);">لا توجد مراكز مفتوحة</div>';
+                return;
+            }
+            
+            container.innerHTML = openPositions.map(pos => {
+                const currentPrice = 1.085; // Mock
+                const pips = pos.action === 'BUY' 
+                    ? (currentPrice - pos.openPrice) 
+                    : (pos.openPrice - currentPrice);
+                const profit = pips * pos.volume * 10000;
+                const profitColor = profit >= 0 ? 'var(--buy)' : 'var(--sell)';
+                
+                return `
+                    <div class="position-card ${pos.action.toLowerCase()}">
+                        <div class="position-header">
+                            <div>
+                                <div style="display: flex; align-items: center; gap: 6px;">
+                                    <span style="font-size: 14px; font-weight: 700;">${pos.symbol}</span>
+                                    <span class="position-badge ${pos.action.toLowerCase()}">${pos.action}</span>
+                                    <span style="font-size: 10px; color: var(--muted);">#${pos.ticket}</span>
+                                </div>
+                                <div style="font-size: 10px; color: var(--dim); margin-top: 2px;">
+                                    الحجم: ${pos.volume} | الافتتاح: ${pos.openPrice.toFixed(5)}
+                                </div>
+                            </div>
+                            <button class="btn sell" onclick="closePosition(${pos.id})" style="padding: 4px 10px; font-size: 10px;">
+                                إغلاق
+                            </button>
+                        </div>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 6px; font-size: 10px; margin-top: 8px;">
+                            <div>
+                                <span style="color: var(--muted);">SL:</span>
+                                <span class="font-mono font-bold" style="color: var(--sell); margin-right: 4px;">
+                                    ${pos.stopLoss ? pos.stopLoss.toFixed(5) : '-'}
+                                </span>
+                            </div>
+                            <div>
+                                <span style="color: var(--muted);">TP:</span>
+                                <span class="font-mono font-bold" style="color: var(--buy); margin-right: 4px;">
+                                    ${pos.takeProfit ? pos.takeProfit.toFixed(5) : '-'}
+                                </span>
+                            </div>
+                            <div>
+                                <span style="color: var(--muted);">الربح:</span>
+                                <span class="font-mono font-bold" style="color: ${profitColor}; margin-right: 4px;">
+                                    ${profit >= 0 ? '+' : ''}${profit.toFixed(2)}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        // ========== HISTORY ==========
+        function loadHistory() {
+            const container = document.getElementById('historyList');
+            
+            if (signalHistory.length === 0) {
+                container.innerHTML = '<div class="text-center" style="padding: 20px; color: var(--muted);">لا توجد إشارات محفوظة</div>';
+                return;
+            }
+            
+            container.innerHTML = signalHistory.slice(0, 20).map(sig => {
+                const actionColor = sig.action === 'BUY' ? 'var(--buy)' : 'var(--sell)';
+                const date = new Date(sig.timestamp);
+                
+                return `
+                    <div class="crd" style="padding: 12px; border: 1px solid rgba(${sig.action === 'BUY' ? '0,212,161' : '255,77,106'},0.15); margin-bottom: 8px;">
+                        <div style="display: flex; gap: 12px; align-items: start;">
+                            <div style="font-size: 24px; color: ${actionColor};">${sig.action === 'BUY' ? '▲' : '▼'}</div>
+                            <div style="flex: 1;">
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+                                    <div>
+                                        <span style="font-size: 14px; font-weight: 700;">${sig.symbol}</span>
+                                        <span style="font-size: 10px; color: var(--muted); margin-right: 8px;">${sig.timeframe}</span>
+                                    </div>
+                                    <div style="font-size: 10px; color: var(--dim);">
+                                        ${date.toLocaleDateString('ar-IQ')} ${date.toLocaleTimeString('ar-IQ', {hour: '2-digit', minute: '2-digit'})}
+                                    </div>
+                                </div>
+                                <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 6px;">
+                                    <div style="background: rgba(${sig.action === 'BUY' ? '0,212,161' : '255,77,106'},0.1); padding: 4px 8px; border-radius: 5px;">
+                                        <span style="font-size: 9px; color: var(--muted);">السعر: </span>
+                                        <span class="font-mono font-bold" style="font-size: 11px; color: ${actionColor};">${sig.price?.toFixed(5)}</span>
+                                    </div>
+                                    <div style="background: rgba(232,178,48,0.1); padding: 4px 8px; border-radius: 5px;">
+                                        <span style="font-size: 9px; color: var(--muted);">الثقة: </span>
+                                        <span class="font-bold" style="font-size: 11px; color: var(--accent);">${sig.confidence}%</span>
+                                    </div>
+                                    <div style="background: rgba(34,211,238,0.1); padding: 4px 8px; border-radius: 5px;">
+                                        <span style="font-size: 9px; color: var(--muted);">القوة: </span>
+                                        <span class="font-bold" style="font-size: 11px; color: var(--ema9);">${sig.strength}%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        // ========== ANALYTICS ==========
+        function loadAnalytics() {
+            const signals = signalHistory.slice(0, 50);
+            const buySignals = signals.filter(s => s.action === 'BUY');
+            const sellSignals = signals.filter(s => s.action === 'SELL');
+            
+            document.getElementById('analyticsSummary').innerHTML = `
+                <div class="crd" style="background: linear-gradient(145deg, var(--buy-dim), var(--card)); border: 1px solid rgba(0,212,161,0.2); padding: 16px;">
+                    <div style="font-size: 11px; color: var(--dim); margin-bottom: 4px;">إشارات الشراء</div>
+                    <div style="font-size: 28px; font-weight: 900; color: var(--buy);">${buySignals.length}</div>
+                </div>
+                <div class="crd" style="background: linear-gradient(145deg, var(--sell-dim), var(--card)); border: 1px solid rgba(255,77,106,0.2); padding: 16px;">
+                    <div style="font-size: 11px; color: var(--dim); margin-bottom: 4px;">إشارات البيع</div>
+                    <div style="font-size: 28px; font-weight: 900; color: var(--sell);">${sellSignals.length}</div>
+                </div>
+                <div class="crd" style="background: linear-gradient(145deg, var(--wait-dim), var(--card)); border: 1px solid rgba(255,176,32,0.2); padding: 16px;">
+                    <div style="font-size: 11px; color: var(--dim); margin-bottom: 4px;">إجمالي الإشارات</div>
+                    <div style="font-size: 28px; font-weight: 900; color: var(--wait);">${signals.length}</div>
+                </div>
+            `;
+            
+            const strongest = [...signals]
+                .filter(s => s.action !== 'WAIT')
+                .sort((a, b) => b.strength - a.strength)
+                .slice(0, 10);
+            
+            document.getElementById('analyticsDetails').innerHTML = `
+                <div class="crd">
+                    <h3 style="font-size: 14px; font-weight: 700; color: var(--accent); margin-bottom: 8px;">🏆 أقوى الإشارات</h3>
+                    ${strongest.map((sig, i) => {
+                        const color = sig.action === 'BUY' ? 'var(--buy)' : 'var(--sell)';
+                        return `
+                            <div style="display: flex; align-items: center; gap: 8px; padding: 8px 10px; background: rgba(${sig.action === 'BUY' ? '0,212,161' : '255,77,106'},0.05); border-radius: 6px; border-right: 3px solid ${color}; margin-bottom: 4px;">
+                                <span style="font-size: 16px; font-weight: 900; color: var(--muted); width: 24px;">${i + 1}</span>
+                                <span style="font-size: 12px; font-weight: 700; flex: 1;">${sig.symbol}</span>
+                                <span style="font-size: 11px; font-weight: 700; color: ${color}; background: rgba(${sig.action === 'BUY' ? '0,212,161' : '255,77,106'},0.15); padding: 3px 8px; border-radius: 4px;">${sig.action}</span>
+                                <span style="font-size: 11px; color: var(--accent); font-weight: 700;">${sig.strength}%</span>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            `;
+        }
+        
+        // ========== UTILITIES ==========
+        function toggleLive() {
+            isLive = !isLive;
+            document.getElementById('liveBtn').textContent = isLive ? '⏹ إيقاف' : '▶ مباشر';
+            if (isLive) {
+                showStatus('info', 'تم تفعيل التحديث المباشر');
+            }
+        }
+        
+        function refreshData() {
+            showStatus('info', 'جاري تحديث البيانات...');
+            setTimeout(() => {
+                loadDashboard();
+                showStatus('info', 'تم التحديث بنجاح');
+            }, 500);
+        }
+        
+        function toggleSettings() {
+            alert('قريباً: لوحة الإعدادات المتقدمة');
+        }
+        
+        function showStatus(type, message) {
+            const banner = document.getElementById('statusBanner');
+            banner.className = `status-banner ${type}`;
+            banner.textContent = message;
+            banner.classList.remove('hidden');
+            
+            setTimeout(() => {
+                banner.classList.add('hidden');
+            }, 3000);
+        }
+        
+        function saveData() {
+            localStorage.setItem('ta3_trading_account', JSON.stringify(tradingAccount));
+            localStorage.setItem('ta3_open_positions', JSON.stringify(openPositions));
+            localStorage.setItem('ta3_trade_history', JSON.stringify(tradeHistory));
+            localStorage.setItem('ta3_signal_history', JSON.stringify(signalHistory));
+        }
+        
+        // ========== MOCK DATA GENERATORS ==========
+        function generateMockSignal(symbol) {
+            const actions = ['BUY', 'SELL', 'WAIT'];
+            const action = actions[Math.floor(Math.random() * actions.length)];
+            const confidence = 55 + Math.floor(Math.random() * 35);
+            const confirmations = Math.floor((confidence / 100) * 10);
+            const rsi = 30 + Math.random() * 40;
+            const entry = 1.08 + Math.random() * 0.02;
+            
+            return {
+                action,
+                confidence,
+                confirmations,
+                rsi,
+                entry,
+                stopLoss: entry - 0.003,
+                tp1: entry + 0.0045,
+                tp2: entry + 0.0075,
+                symbol
+            };
+        }
+        
+        function generateMockChartData() {
+            const data = [];
+            let price = 1.085;
+            
+            for (let i = 0; i < 50; i++) {
+                price += (Math.random() - 0.5) * 0.001;
+                const rsi = 30 + Math.random() * 40;
+                
+                data.push({
+                    time: `${i}m`,
+                    close: price,
+                    ema9: price + 0.0002,
+                    ema21: price + 0.0004,
+                    rsi: rsi
+                });
+            }
+            
+            return data;
+        }
+        
+        // Save signal to history when generated
+        function saveSignalToHistory(signal, symbol, timeframe) {
+            if (!signal || signal.action === 'WAIT') return;
+            
+            const entry = {
+                id: Date.now(),
+                symbol,
+                timeframe,
+                action: signal.action,
+                confidence: signal.confidence,
+                price: signal.entry,
+                stopLoss: signal.stopLoss,
+                tp1: signal.tp1,
+                tp2: signal.tp2,
+                timestamp: Date.now(),
+                strength: Math.floor((signal.confidence + signal.confirmations * 5) / 2)
+            };
+            
+            signalHistory.unshift(entry);
+            if (signalHistory.length > 100) signalHistory = signalHistory.slice(0, 100);
+            saveData();
+        }
+        
+        // Update risk calculations when inputs change
+        document.getElementById('accountBalanceInput')?.addEventListener('input', function() {
+            const signal = generateMockSignal('BTC/USD');
+            updateRiskCalculations(signal);
+        });
+        
+        document.getElementById('riskPercentageInput')?.addEventListener('input', function() {
+            const signal = generateMockSignal('BTC/USD');
+            updateRiskCalculations(signal);
+        });
+    </script>
 </body>
 </html>
